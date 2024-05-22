@@ -8,7 +8,9 @@ export const UserProvider = ({ children }) => {
   const [logado, setLogado] = useState(false);
   const [remember, setRemember] = useState(false);
   const [id_empresa, setIdEmpresa] = useState(null);
-  const [id_usuario, setIdUsuario] = useState(null);
+  const [idUsuario, setIdUsuario] = useState(null);
+  const [idNivel, setIdNIvel] = useState(null);
+
 
   return (
     <UsuarioContext.Provider
@@ -23,8 +25,10 @@ export const UserProvider = ({ children }) => {
         setRemember,
         id_empresa,
         setIdEmpresa,
-        id_usuario,
+        idUsuario,
         setIdUsuario,
+        idNivel,
+        setIdNIvel
       }}
     >
       {children}

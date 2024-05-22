@@ -1,9 +1,9 @@
-import { Button, Checkbox, Col, DatePicker, Divider, Drawer, DrawerProps, Form, Input, Layout, Radio, RadioChangeEvent, Row, Select, Space, Table, Typography } from "antd";
+import { Button, Col, DatePicker, Divider, Drawer, DrawerProps, Form, Input, Layout, Radio, RadioChangeEvent, Row, Select, Space, Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useContext, useEffect, useState } from "react";
 import UsuariosService from "../../services/UsuarioService";
 import { UsuarioContext } from "../../context/useContext";
-import { DeleteOutlined, EditOutlined, PlayCircleOutlined, PlusOutlined, StopOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined, StopOutlined } from "@ant-design/icons";
 
 const service = new UsuariosService();
 const estilorow = {
@@ -17,6 +17,8 @@ const estiloForm = {
 
 
 export default function UsuariosAdminPage() {
+    const [form] = Form.useForm();
+    
     const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
     const { usuario_id, setUsuarioId } = useContext(UsuarioContext);
 
@@ -34,6 +36,37 @@ export default function UsuariosAdminPage() {
     const [dadosEnviados, setDadosEnviados] = useState([])
     const [edit, setEdit] = useState(false)
 
+    const [registros, setRegistros] = useState(0);
+    const [editando, setEditando] = useState(false)
+    const [loading, setLoading] = useState(false);
+
+    /**************** retorno da chamada *********/
+    const [status, setStatus] = useState('');
+    //**************** retorno da chamada *********/
+
+    //************* PopNotificacao *****************/
+    const [popNotificacao, setPopNotificacao] = useState(false)
+    const [tituloNotificacao, setTituloNotificacao] = useState('Salvar/Atualizar Escola')
+    const [subTituloNotificacao, setSubTituloNotificacao] = useState('Escola Salva/Atualizada com sucesso.')
+    const [tipoNotificacao, setTipoNotificacao] = useState('success')
+    //************* PopNotificacao *****************/
+
+    /***************** padrao das telas(INICIO) ******************* */
+    /***************** teste setar dados ******************/
+    // Estado para armazenar os dados do formulário
+    const [formData, setFormData] = useState({
+        id_usuario: 0,
+        nome: '',
+        login: '',
+        senha: '',
+        email: '',
+        nivel: '',
+        numero: '',
+        telefone1: '',
+        telefone2: '',
+        ativo: true
+    });
+
     async function listaUsuarios(id_empresa: number) {
         console.log(id_empresa)
         let rs = await service.listaUsuarios(id_empresa);
@@ -41,18 +74,28 @@ export default function UsuariosAdminPage() {
         setDados(rs.data.usuarios)
     }
 
+    function atualizarDados() {
+        listaUsuarios(id_empresa)
+    }
+
     useEffect(() => {
         listaUsuarios(id_empresa)
     }, []);
 
 
-    interface DataType {
+    interface DataTypeUsuarios {
         key: number;
-        nome: string;
-        ativo: boolean;
         usuario_id: number;
+        nome: string;
+        login: string;
+        senha: string;
+        email: string;
+        telefone1: string;
+        telefone2: string;
+        nivel: number;
+        ativo: boolean;
     }
-    const columns: ColumnsType<DataType> = [
+    const columns: ColumnsType<DataTypeUsuarios> = [
         { title: 'Nome', dataIndex: 'nome', key: 'nome' },
         { title: 'Email', dataIndex: 'email', key: 'email' },
         { title: 'Telefone', dataIndex: 'telefone1', key: 'telefone1' },
@@ -301,10 +344,15 @@ export default function UsuariosAdminPage() {
     return (
         <>
             <Layout style={estiloForm}>
-                <Typography style={{paddingBottom: 10, fontSize: 18}}>Cadastro de Usuários</Typography>
-                <Button type="primary" onClick={showDrawer} style={{width: 150, padding: 4}} icon={<PlusOutlined />}>
-                    Novo Usuário
-                </Button>
+                <Typography style={{ paddingBottom: 10, fontSize: 18 }}>Cadastro de Usuários</Typography>
+                <div>
+                    <Button disabled type="primary" onClick={showDrawer} style={{ width: 150, padding: 4 }} icon={<PlusOutlined /> }>
+                        Novo Usuário
+                    </Button>
+                    <Button onClick={atualizarDados} style={{ width: 150, marginLeft: 5 }} icon={<ReloadOutlined />}>
+                        Atualizar
+                    </Button>
+                </div>
                 <Divider />
                 <Table
                     bordered

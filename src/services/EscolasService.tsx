@@ -9,11 +9,13 @@ const api = axios.create({
   },
 });
 
+const pre_url = 'escolas'
+
 class EscolasService {
   async listaEscolas(id_empresa: number) {
     let rs;
     try {
-      const response = await api.get(`escolas/lista/${id_empresa}`);
+      const response = await api.get(`${pre_url}/lista/${id_empresa}`);
       console.log("*********** listaEscolas(EscolasService) *****************");
       rs = {
         statusCode: response.status,
@@ -54,7 +56,7 @@ class EscolasService {
     console.log(escola);
 
     try {
-      rs = await api.post(`escolas/cadastrar`, escola, {
+      rs = await api.post(`${pre_url}/cadastrar`, escola, {
         headers: { "Content-Type": "application/json" },
       });
       console.log(rs.data);
@@ -69,7 +71,7 @@ class EscolasService {
 
   async desativarEscola(id: number) {
     try {
-      let rs = await api.patch(`escolas/desativarEscola/${id}`);
+      let rs = await api.patch(`${pre_url}/desativarEscola/${id}`);
       console.log(rs);
       return rs;
     } catch (e) {
@@ -80,7 +82,7 @@ class EscolasService {
   async deletarEscola(id: number) {
     let rs;
     try {
-      rs = await api.delete(`escolas/${id}`);
+      rs = await api.delete(`${pre_url}/${id}`);
       console.log(rs.data);
       return rs;
     } catch (e) {

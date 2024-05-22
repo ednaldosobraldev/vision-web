@@ -9,39 +9,56 @@ import {
   WhatsAppOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, Button, theme, Image, Row, Typography, Col } from "antd";
-import { useContext, useState } from "react";
-import { Link, Outlet, redirect } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, Outlet, redirect, useNavigate } from "react-router-dom";
 import { UsuarioContext } from "../context/useContext";
 
 const { SubMenu } = Menu;
 const { Header, Sider, Content } = Layout;
 
 export default function HomePage() {
+  /************ user context *************/
+  const navigate = useNavigate()
+
   const { nome, setNome } = useContext(UsuarioContext);
-  const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
   const { logado, setLogado } = useContext(UsuarioContext);
   const { remember, setRemember } = useContext(UsuarioContext);
   const { token, setToken } = useContext(UsuarioContext);
+  const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
+  const { idUsuario, setIdUsuario } = useContext(UsuarioContext);
+  const { idNivel, setIdNIvel } = useContext(UsuarioContext);
+  /************ user context *************/
+
+  useEffect(() => {
+
+  })
+
 
   const [collapsed, setCollapsed] = useState(true);
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const logOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("nome");
-    localStorage.removeItem("remember");
-    localStorage.removeItem("logado");
-    localStorage.removeItem("id_empresa");
-    //localStorage.removeItem("logado");
-    setNome('')
-    setToken('');
-    setLogado(false);
-    setRemember(false);
-    setIdEmpresa(0);
 
-    redirect('/login')
+
+  const logOut = () => {
+    // localStorage.removeItem("token");
+    // localStorage.removeItem("nome");
+    // localStorage.removeItem("remember");
+    // localStorage.removeItem("logado");
+    // localStorage.removeItem("id_empresa");
+    // //localStorage.removeItem("logado");
+
+    setNome("");
+    setToken('');
+    setIdUsuario(-1)
+    setIdNIvel(-1)
+    setIdEmpresa(-1);
+    setRemember(false);
+    setLogado(false)
+
+    return navigate('/login')
+    //redirect('/login')
   };
 
   return (
@@ -109,86 +126,15 @@ export default function HomePage() {
             </SubMenu>
 
             <SubMenu
-              key="sub-menu-escolas"
+              key="sub-menu-empresas"
               icon={<FolderAddOutlined />}
-              title="Escolas"
+              title="Empresas"
             >
               <Menu.Item key="escolas">
-                <Link to="/escolas" className="nav-text">
-                  Escolas
+                <Link to="/empresas" className="nav-text">
+                  Empresas
                 </Link>
               </Menu.Item>
-              <Menu.Item key="turmas">
-                <Link to="/turmas" className="nav-text">
-                  Turmas
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="perfilusuariospage">
-                <Link
-                  to="/perfis"
-                  className="nav-text"
-                  title="Perfís dos Usuários"
-                >
-                  Perfis
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="usuarios">
-                <Link to="/usuarios" className="nav-text">
-                  Usuários
-                </Link>
-              </Menu.Item>
-            </SubMenu>
-            <SubMenu
-              key="sub-menu-acervo"
-              icon={<FolderAddOutlined />}
-              title="Acervo"
-            >
-              <Menu.Item key="acervo-manuais">
-                <Link
-                  to="/manuais"
-                  className="nav-text"
-                  title="Manuais para consulta"
-                >
-                  Manuais
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="acervo-videos">
-                <Link
-                  to="/videos"
-                  className="nav-text"
-                  title="Vídeo/Revistas Educativas"
-                >
-                  Videos
-                </Link>
-              </Menu.Item>
-            </SubMenu>
-            <SubMenu
-              key="sub-menu-quiz"
-              icon={<FolderAddOutlined />}
-              title="Quiz"
-            >
-              <Menu.Item key="quiz">
-                <Link to="/quiz" className="nav-text" title="Cadastro de Quiz">
-                  Perguntas
-                </Link>
-              </Menu.Item>
-              <Menu.Item key="quiz-niveis">
-                <Link to="/niveisquiz" className="nav-text" title="Cadastro de níveis do Quiz">
-                  Níveis Quiz
-                </Link>
-              </Menu.Item>
-            </SubMenu>
-            <SubMenu
-              key="sub-menu-salas-desafio"
-              icon={<FolderAddOutlined />}
-              title="Salas Desafio"
-            >
-              <Menu.Item key="salas-desafio">
-                <Link to="/salasdesafio" className="nav-text" title="Salas Desafio">
-                  Salas
-                </Link>
-              </Menu.Item>
-
             </SubMenu>
           </SubMenu>
 
@@ -225,7 +171,7 @@ export default function HomePage() {
             />
 
             <div style={{ paddingRight: 10 }}>
-              Usuário: {nome.toUpperCase()}
+              Usuário: {nome.toUpperCase()} Nível: {idNivel}
             </div>
           </Header>
         </Row>

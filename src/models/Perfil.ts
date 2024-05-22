@@ -50,12 +50,11 @@ export default class Perfil {
   }
   /******************* ativo **************************/
   setAtivo(ativo: boolean) {
-    // if(ativo){
-    //     this.ativo = true
-    // }else{
-    //     this.ativo = false
-    // }
-    ativo ? (this.ativo = true) : false;
+    if(ativo){
+        this.ativo = true
+    }else{
+        this.ativo = false
+    }
   }
   getAtivo() {
     return this.ativo;

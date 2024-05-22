@@ -10,19 +10,26 @@ const service = new UsuariosService();
 
 
 export default function LoginPage() {
-  const navigate = useNavigate()
   /************ user context *************/
+  const navigate = useNavigate()
+
   const { nome, setNome } = useContext(UsuarioContext);
   const { logado, setLogado } = useContext(UsuarioContext);
   const { remember, setRemember } = useContext(UsuarioContext);
   const { token, setToken } = useContext(UsuarioContext);
   const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
+  const { idUsuario, setIdUsuario } = useContext(UsuarioContext);
+  const { idNivel, setIdNIvel } = useContext(UsuarioContext);
+  /************ user context *************/
+
   const [senha, setSenha] = useState("");
   const [msg, setMsg] = useState('')
   const [loading, setLoading] = useState(false);
   const [login, setLogin] = useState('')
 
-  //console.log(saveLogin);
+  useEffect(() => {
+    resetCampos();
+  }, []);
 
   const onFinishFailed = (errorInfo: any) => {
     console.log("Failed:", errorInfo);
@@ -35,17 +42,6 @@ export default function LoginPage() {
 
   function salvarSenha(e: any) {
     setSenha(e.target.value);
-  }
-
-  function resetCampos() {
-    setNome("");
-    setSenha("");
-    setToken('');
-    setLogin('')
-    setMsg('')
-    setIdEmpresa(0);
-    setRemember(false);
-    setLoading(false);
   }
 
   function salvarLogin() {
@@ -71,24 +67,20 @@ export default function LoginPage() {
     justifyContent: "center",
   };
 
-  useEffect(() => {
-    //let resp = service.listaUsuarios();
-    //let resp2 = UsuarioService.listaUsuarios('usuariosg/1');
-    //console.log(resp);
-    //console.log(resp2);
 
-
-
-    /*const lembrar = localStorage.getItem("logado");
-    try {
-      if (lembrar) {
-        let usuario = localStorage.getItem("usuario");
-      }
-    } catch (error) {}*/
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    //return navigate('/home')
-  }, []);
-
+  function resetCampos() {
+    setNome("");
+    setSenha("");
+    setToken('');
+    setLogin('')
+    setIdUsuario(-1)
+    setIdNIvel(-1)
+    setMsg('')
+    setIdEmpresa(-1);
+    setRemember(false);
+    setLoading(false);
+    setLogado(false)
+  }
   async function onFinish() {
     console.log("*************** onfinish ************");
     setLoading(true);
@@ -96,50 +88,27 @@ export default function LoginPage() {
     let resp = await service.login(login, senha);
 
     console.log(resp?.data);
-    if (resp) {
-      setToken(resp.data.token);
-      setIdEmpresa(resp.data.id_empresa);
-      setNome(resp.data.nome);
+    if (resp?.data == null) {
+      setLoading(false);
+      setLogado(false)
+      setMsg('Falha de autenticação!')
+    } else {
+      setToken(resp?.data.token);
+      setIdEmpresa(resp?.data.id_empresa);
+      setNome(resp?.data.nome);
+      setIdUsuario(resp?.data.id_usuario)
+      setIdNIvel(resp?.data.id_nivel)
       setLogado(true);
       setRemember(true);
-      console.log('id_empresa: ' + resp.data.id_empresa)
-
-      localStorage.setItem("token", resp.data.token);
-      localStorage.setItem("nome", nome);
-      localStorage.setItem("remember", remember);
-      localStorage.setItem("logado", logado);
-      localStorage.setItem("id_empresa", id_empresa);
 
       console.log("Success");
       console.log("remember: " + remember);
       setTimeout(function () {
-
         setLoading(false);
-        console.log("************** function redirecionar ******************");
         setLogado(true);
-        console.log(logado);
-        if (logado) {
-          return navigate('/')
-        }
+        return navigate('/')
       }, 3000);
 
-
-    } else {
-      setLoading(false);
-      localStorage.removeItem("nome");
-      localStorage.removeItem("id_empresa");
-      localStorage.removeItem("token");
-      localStorage.removeItem("remember");
-      console.log("Failed");
-
-      setNome('')
-      setSenha('')
-      setToken('')
-      setLogin('')
-      setIdEmpresa(0)
-      setMsg('Falha de autenticação!')
-      setRemember(false)
-      setLogado(false)
     }
   }
 

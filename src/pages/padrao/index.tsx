@@ -16,7 +16,7 @@ const estiloForm = {
     backgroundColor: '#FFFFFF',
 }
 
-export default function EscolasPage() {
+export default function PadraoPage() {
     const [form] = Form.useForm();
 
     const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
@@ -158,6 +158,8 @@ export default function EscolasPage() {
         });
         console.log(formData);
     };
+    // Função para manipular a alteração nos campos do formulário
+
 
     // Função para lidar com o envio do formulário
     const salvarEscola = async () => {

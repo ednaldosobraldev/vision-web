@@ -1,5 +1,4 @@
 {
-  "proxy": "http://localhost:3001/api/v1/",
   "name": "vision-web",
   "version": "0.1.0",
   "private": true,
@@ -48,5 +47,4 @@
       "last 1 safari version"
     ]
   }
-  
 }

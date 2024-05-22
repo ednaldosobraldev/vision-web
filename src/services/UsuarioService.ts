@@ -44,12 +44,7 @@ class UsuariosService {
     } catch (e) {
       //console.log(e);
     }
-
-    //console.log(rs);
-    //console.log(rs?.status);
-
     return rs;
-    //console.log('login', url);
   }
 }
 

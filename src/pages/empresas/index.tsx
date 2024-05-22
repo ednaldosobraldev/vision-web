@@ -1,31 +1,35 @@
-import { Button, Card, Col, Divider, Drawer, DrawerProps, Form, Input, Layout, Radio, RadioChangeEvent, Row, Space, Switch, Table, Typography } from "antd";
-import { ColumnsType } from "antd/es/table";
+import { Button, Card, Col, Divider, Drawer, DrawerProps, Form, Input, Layout, Radio, RadioChangeEvent, Row, Space, Switch, Typography } from "antd";
 import { useContext, useEffect, useState } from "react";
-
-import { CaretLeftOutlined, CaretRightOutlined, DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined, StopOutlined } from "@ant-design/icons";
 import { UsuarioContext } from "../../context/useContext";
-import EscolasService from "../../services/EscolasService";
+import EmpresasService from "../../services/EmpresasService";
+import Table, { ColumnsType } from "antd/es/table";
+import { CaretLeftOutlined, CaretRightOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import PopUpConfirmarAcaoDeletar from "../../components/DeletarRegComponent";
 import PopUpConfirmarAcaoAtivarInativar from "../../components/InativarRegComponent";
+import { EmpresaModel } from "../../models/Empresa";
 import PopNotificacao from "../../components/PopNotificacao";
-import { EscolaModel } from "../../models/EscolaModel";
 
-const service = new EscolasService();
+
+const service = new EmpresasService();
 
 const estiloForm = {
     backgroundColor: '#FFFFFF',
 }
 
-export default function EscolasPage() {
-    const [form] = Form.useForm();
-
+export default function EmpresasPage() {
+    
+    /********************* variaveis de contexto  ********************/
     const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
     const { usuario_id, setUsuarioId } = useContext(UsuarioContext);
-
+    
     const [rua, setRua] = useState('');
     const [bairro, setBairro] = useState('');
     const [cidade, setCidade] = useState('');
     const [uf, setUF] = useState('');
+    
+    /************************** FORM PADRAO *****************************/
+    const [form] = Form.useForm();
+    const [isNewCadastro, setIsNewCadastro] = useState(true); // Estado para controlar se é um novo cadastro ou não
 
     const [dados, setDados] = useState([]);
     const [registros, setRegistros] = useState(0);
@@ -38,8 +42,8 @@ export default function EscolasPage() {
 
     //************* PopNotificacao *****************/
     const [popNotificacao, setPopNotificacao] = useState(false)
-    const [tituloNotificacao, setTituloNotificacao] = useState('Salvar/Atualizar Escola')
-    const [subTituloNotificacao, setSubTituloNotificacao] = useState('Escola Salva/Atualizada com sucesso.')
+    const [tituloNotificacao, setTituloNotificacao] = useState('Salvar/Atualizar Empresa')
+    const [subTituloNotificacao, setSubTituloNotificacao] = useState('Empresa Salva/Atualizada com sucesso.')
     const [tipoNotificacao, setTipoNotificacao] = useState('success')
     //************* PopNotificacao *****************/
 
@@ -47,11 +51,16 @@ export default function EscolasPage() {
     /***************** teste setar dados ******************/
     // Estado para armazenar os dados do formulário
     const [formData, setFormData] = useState({
-        id_escola: 0,
-        nome_escola: '',
+        id_empresa: 0,
+        cpf_cnpj: '',
+        ie: '',
+        descricao_empresa: '',
+        razao: '',
+        fantasia: '',
         rua: '',
         bairro: '',
         cidade: '',
+        uf: '',
         cep: '',
         numero: '',
         telefone1: '',
@@ -60,65 +69,93 @@ export default function EscolasPage() {
     });
 
     useEffect(() => {
-        listaEscolas(id_empresa)
+        listaEmpresas(id_empresa)
     }, []);
 
-    // useEffect(() => { 
-    //     return () => { 
-    //      console.log("Vou ser chamado toda vez que o componente for desmontado") 
-    //     } 
-    //   });
-
-    interface DataTypeEscolas {
-        key: number;
-        id_escola: number;
-        nome_escola: string;
-        rua: string;
-        bairro: string;
-        cidade: string;
-        cep: string;
-        numero: string;
-        telefone1: string;
-        telefone2: string;
-        ativo: boolean;
+    async function listaEmpresas(id_empresa: number) {
+        console.log('id_empresa: ' + id_empresa)
+        let rs = await service.listarEmpresas(id_empresa);
+        console.log(rs)
+        setDados(rs.data.empresas)
+        setRegistros(rs.data.tamanho)
     }
-    const columns: ColumnsType<DataTypeEscolas> = [
-        {
-            title: 'Nome Escola', dataIndex: 'nome_escola', key: 'nome',
-            render: (nome_escola, record) => <span style={{ color: record.ativo ? '#000' : 'red' }}>{nome_escola}</span>
-        },
-        {
-            title: 'Telefone', dataIndex: 'telefone1', key: 'telefone1',
-            render: (telefone1, record) => <span style={{ color: record.ativo ? '#000' : 'red' }}>{telefone1}</span>
-        },
-        {
-            title: 'Ativo', dataIndex: 'ativo', key: 'ativo', width: '30px', align: 'center',
-            render: (ativo: string) => <span style={{ color: ativo ? '#000' : 'red' }}>{ativo ? 'SIM' : 'NÃO'}</span>
-        },
-        {
-            title: 'Action',
-            dataIndex: 'nome_escola',
-            key: 'id_escola',
-            width: '140px',
-            //render: (_, index) => <Button icon={<EditOutlined />} onClick={() => <CadUsuarios nome={index.nome} idusuario={index.usuario_id} />} />
-            render: (item, record, index) =>
-                <>
-                    <Button icon={<EditOutlined />} onClick={() => editarEscola(record)} style={{ color: 'blue', marginRight: '5px', borderColor: 'blue' }} title="Editar Escola" />
-                    <PopUpConfirmarAcaoDeletar titulo='Deletar Escola' subTitulo='Confirma a exclusão da Escola?' idRegistro={(record.id_escola)} atualizar={_atualizarDados} metodoService={service.deletarEscola} title="Deletar Escola" />
-                    <PopUpConfirmarAcaoAtivarInativar titulo='Ativar/Inativar' subTitulo='Confirma Ativar/Inativar a Escola' idRegistro={(record.id_escola)} atualizar={_atualizarDados} metodoService={service.desativarEscola} title="Ativar/Inativar Escola" />
 
-                </>
-        },
-    ];
+    function editarEmpresa(dadosrecebidos: any) {
+        setEditando(true)
 
-    function novaEscola() {
+        setFormData({
+            id_empresa: dadosrecebidos.id_empresa,
+            descricao_empresa: dadosrecebidos.descricao_empresa,
+            razao: dadosrecebidos.razao,
+            fantasia: dadosrecebidos.fantasia,
+            cpf_cnpj: dadosrecebidos.cpf_cnpj,
+            ie: dadosrecebidos.ie,
+            rua: dadosrecebidos.rua,
+            bairro: dadosrecebidos.bairro,
+            cidade: dadosrecebidos.cidade,
+            uf: dadosrecebidos.uf,
+            cep: dadosrecebidos.cep,
+            numero: dadosrecebidos.numero,
+            telefone1: dadosrecebidos.telefone1,
+            telefone2: dadosrecebidos.telefone2 !== null ? dadosrecebidos.telefone2 : '',
+            ativo: dadosrecebidos.ativo
+        })
+        form.setFieldsValue({
+            id_empresa: dadosrecebidos.id_empresa,
+            descricao_empresa: dadosrecebidos.descricao_empresa,
+            razao: dadosrecebidos.razao,
+            fantasia: dadosrecebidos.fantasia,
+            cpf_cnpj: dadosrecebidos.cpf_cnpj,
+            ie: dadosrecebidos.ie,
+            rua: dadosrecebidos.rua,
+            bairro: dadosrecebidos.bairro,
+            cidade: dadosrecebidos.cidade,
+            uf: dadosrecebidos.uf,
+            cep: dadosrecebidos.cep,
+            numero: dadosrecebidos.numero,
+            telefone1: dadosrecebidos.telefone1,
+            telefone2: dadosrecebidos.telefone2,
+            ativo: dadosrecebidos.ativo
+        });
+        console.log(dadosrecebidos)
+
+        showDrawer()
+
+    }
+
+    function voltarRegisto(idEmpresa: Number) {
+        console.log(idEmpresa)
+    }
+
+    function avancarRegisto(idEmpresa: Number) {
+        console.log(idEmpresa)
+    }
+
+    async function buscarCep(e: any) {
+        let x = e.target.value;
+        if (x.length === 8) {
+            let rs = await service.buscaCep(x)
+            console.log(rs);
+            setRua(rs.logradouro)
+            setBairro(rs.bairro)
+            setCidade(rs.localidade)
+            setUF(rs.uf)
+        }
+    }
+
+    function novaEmpresa() {
         setEditando(false)
         setFormData({
-            id_escola: 0,
-            nome_escola: '',
+            id_empresa: 0,
+            cpf_cnpj: '',
+            ie: '',
+            descricao_empresa: '',
+            razao: '',
+            fantasia: '',
             rua: '',
             bairro: '',
             cidade: '',
+            uf: '',
             cep: '',
             numero: '',
             telefone1: '',
@@ -126,11 +163,16 @@ export default function EscolasPage() {
             ativo: true
         })
         form.setFieldsValue({
-            id_escola: 0,
-            nome_escola: '',
+            id_empresa: 0,
+            cpf_cnpj: '',
+            ie: '',
+            descricao_empresa: '',
+            razao: '',
+            fantasia: '',
             rua: '',
             bairro: '',
             cidade: '',
+            uf: '',
             cep: '',
             numero: '',
             telefone1: '',
@@ -140,8 +182,6 @@ export default function EscolasPage() {
         console.log(formData)
         showDrawer()
     }
-
-
     const onFinishFailed = (errorInfo: any) => {
         console.log("Failed:", errorInfo);
     };
@@ -158,18 +198,22 @@ export default function EscolasPage() {
         });
         console.log(formData);
     };
-
     // Função para lidar com o envio do formulário
-    const salvarEscola = async () => {
+    const salvarEmpresa = async () => {
 
         setLoading(true);
         console.log('************* salvando(ON FINISH) ***********')
-        let escola = new EscolaModel(+formData.id_escola,
-            id_empresa,
-            formData.nome_escola,
+        let empresa = new EmpresaModel(
+            +formData.id_empresa,
+            formData.descricao_empresa,
+            formData.cpf_cnpj,
+            formData.ie,
+            formData.razao,
+            formData.fantasia,
             formData.rua,
             formData.bairro,
             formData.cidade,
+            formData.uf,
             formData.cep,
             formData.numero,
             formData.telefone1,
@@ -177,22 +221,22 @@ export default function EscolasPage() {
             formData.ativo)
 
         let res;
-        !editando ? res = await service.cadastrarEscola(escola) : res = await service.atualizarEscola(escola)
+        !editando ? res = await service.cadastrarEmpresa(empresa) : res = await service.atualizarEmpresa(empresa)
         setStatus(res)
 
 
         //************ pop notificacao ************/
         setPopNotificacao(true);
         setSubTituloNotificacao(res.mensagem)
-        res.status == 401 ?? setTipoNotificacao('error')
+        res.status === 401 ?? setTipoNotificacao('error')
         //************ pop notificacao ************/
 
         setTimeout(function () {
-            listaEscolas(id_empresa)
+            listaEmpresas(id_empresa)
             setLoading(false)
             onClose()
         }, 1000);
-        listaEscolas(id_empresa)
+        listaEmpresas(id_empresa)
 
         //************ pop notificacao ************/
         setTimeout(() => {
@@ -201,46 +245,16 @@ export default function EscolasPage() {
         //************ pop notificacao ************/
     };
 
-    function editarEscola(dadosrecebidos: any) {
-        setEditando(true)
-
-        setFormData({
-            id_escola: dadosrecebidos.id_escola,
-            nome_escola: dadosrecebidos.nome_escola,
-            rua: dadosrecebidos.rua,
-            bairro: dadosrecebidos.bairro,
-            cidade: dadosrecebidos.cidade,
-            cep: dadosrecebidos.cep,
-            numero: dadosrecebidos.numero,
-            telefone1: dadosrecebidos.telefone1,
-            telefone2: dadosrecebidos.telefone2,
-            ativo: dadosrecebidos.ativo
-        })
-        form.setFieldsValue({
-            id_escola: dadosrecebidos.id_escola,
-            nome_escola: dadosrecebidos.nome_escola,
-            rua: dadosrecebidos.rua,
-            bairro: dadosrecebidos.bairro,
-            cidade: dadosrecebidos.cidade,
-            cep: dadosrecebidos.cep,
-            numero: dadosrecebidos.numero,
-            telefone1: dadosrecebidos.telefone1,
-            telefone2: dadosrecebidos.telefone2,
-            ativo: dadosrecebidos.ativo
-        });
-        console.log(dadosrecebidos)
-
-        showDrawer()
-
+    function _atualizarDados() {
+        listaEmpresas(id_empresa)
     }
 
-    function voltarRegisto(idEscola: Number) {
-        console.log(idEscola)
+    function atualizarDados() {
+        listaEmpresas(id_empresa)
     }
 
-    function avancarRegisto(idEscola: Number) {
-        console.log(idEscola)
-    }
+
+
 
     const validateMessages = {
         required: '${label} is required!',
@@ -253,33 +267,53 @@ export default function EscolasPage() {
         },
     };
 
-    async function buscarCep(e: any) {
-        let x = e.target.value;
-        if (x.length == 8) {
-            let rs = await service.buscaCep(x)
-            console.log(rs);
-            setRua(rs.logradouro)
-            setBairro(rs.bairro)
-            setCidade(rs.localidade)
-            setUF(rs.uf)
-            //setCep(e.target.value)
-        }
+    interface DataTypeEmpresas {
+        key: number;
+        id_empresa: number;
+        cpf_cnpj: string;
+        ie: string;
+        descricao_empresa: string;
+        razao: string;
+        fantasia: string;
+        cep: string;
+        cidade: string;
+        bairro: string;
+        numero: string;
+        uf: string;
+        telefone1: string;
+        telefone2: string;
+        ativo: boolean;
     }
 
-    async function listaEscolas(id_empresa: number) {
-        console.log('id_empresa: ' + id_empresa)
-        let rs = await service.listaEscolas(id_empresa);
-        console.log(rs)
-        setDados(rs.data.escolas)
-        setRegistros(rs.data.tamanho)
-    }
-    function _atualizarDados() {
-        listaEscolas(id_empresa)
-    }
+    const columns: ColumnsType<DataTypeEmpresas> = [
+        {
+            title: 'Empresa', dataIndex: 'descricao_empresa', key: 'descricao_empresa',
+            render: (descricao_empresa, record) => <span style={{ color: record.ativo ? '#000' : 'red' }}>{descricao_empresa}</span>
+        },
+        {
+            title: 'Cpf/Cnpj', dataIndex: 'cpf_cnpj', key: 'cpf_cnpj',
+            render: (cpf_cnpj, record) => <span style={{ color: record.ativo ? '#000' : 'red' }}>{cpf_cnpj}</span>
+        },
+        {
+            title: 'Ativo', dataIndex: 'ativo', key: 'ativo', width: '30px', align: 'center',
+            render: (ativo: string) => <span style={{ color: ativo ? '#000' : 'red' }}>{ativo ? 'SIM' : 'NÃO'}</span>
+        },
+        {
+            title: 'Action',
+            dataIndex: 'id_empresa',
+            key: 'id_empresa',
+            width: '140px',
+            //render: (_, index) => <Button icon={<EditOutlined />} onClick={() => <CadUsuarios nome={index.nome} idusuario={index.usuario_id} />} />
+            render: (item, record, index) =>
+                <>
+                    <Button icon={<EditOutlined />} onClick={() => editarEmpresa(record)} style={{ color: 'blue', marginRight: '5px', borderColor: 'blue' }} title="Editar Empresa" />
+                    <PopUpConfirmarAcaoDeletar titulo='Deletar Empresa' subTitulo='Confirma a exclusão da Empresa?' idRegistro={(record.id_empresa)} atualizar={_atualizarDados} metodoService={service.deletarEmpresa} title="Deletar Empresa" />
+                    <PopUpConfirmarAcaoAtivarInativar titulo='Ativar/Inativar' subTitulo='Confirma Ativar/Inativar a Empresa' idRegistro={(record.id_empresa)} atualizar={_atualizarDados} metodoService={service.desativarEmpresa} title="Ativar/Inativar Empresa" />
 
-    function atualizarDados() {
-        listaEscolas(id_empresa)
-    }
+                </>
+        },
+    ];
+
 
     /************* DRAWER INICIO *************/
     //************* PARAMETROS DRAWER INICIO *******************/
@@ -306,18 +340,18 @@ export default function EscolasPage() {
         <>
             <div className="fade-in-div">
                 <Drawer
-                    title="Cadastro de Escolas `"
-                    width={720}
+                    title="Cadastro de Empresa"
+                    width={700}
                     onClose={onClose}
                     open={open}
                     placement={placement}
                     bodyStyle={{ paddingBottom: 80 }}
                 >
-                    {formData.id_escola > 0 && (
+                    {formData.id_empresa > 0 && (
                         <>
                             <Card title="Avançar/Retroceder Registros">
-                                <Button icon={<CaretLeftOutlined />} onClick={() => voltarRegisto(formData.id_escola)} style={{ color: 'blue', marginRight: '5px', borderColor: 'blue' }} title="Registro Anterior" />
-                                <Button icon={<CaretRightOutlined />} onClick={() => avancarRegisto(formData.id_escola)} style={{ color: 'blue', marginRight: '5px', borderColor: 'blue' }} title="Próximo Registro" />
+                                <Button icon={<CaretLeftOutlined />} onClick={() => voltarRegisto(formData.id_empresa)} style={{ color: 'blue', marginRight: '5px', borderColor: 'blue' }} title="Registro Anterior" />
+                                <Button icon={<CaretRightOutlined />} onClick={() => avancarRegisto(formData.id_empresa)} style={{ color: 'blue', marginRight: '5px', borderColor: 'blue' }} title="Próximo Registro" />
                             </Card>
                         </>
                     )}
@@ -334,7 +368,7 @@ export default function EscolasPage() {
                     <Form
                         form={form}
                         layout="vertical"
-                        onFinish={salvarEscola} /*teste */
+                        onFinish={salvarEmpresa} /*teste */
                         onFinishFailed={onFinishFailed}
                         autoComplete="off"
                         style={{ maxWidth: 600 }}
@@ -356,32 +390,32 @@ export default function EscolasPage() {
                             <Col span={2}>
                                 <Form.Item
                                     label="ID"
-                                    name='id_escola'
+                                    name='id_empresa'
                                 >
-                                    <Input placeholder="Id" readOnly value={editando ? formData.id_escola : ''} />
+                                    <Input placeholder="Id" readOnly value={editando ? formData.id_empresa : ''} />
                                 </Form.Item>
                             </Col>
                             <Col span={22}>
                                 <Form.Item
-                                    label="Nome da Escola"
-                                    name='nome_escola'
-                                    rules={[{ required: true, message: 'Digite o nome da escola', min: 20, max: 80 }]}
+                                    label="Descrição Empresa"
+                                    name='descricao_empresa'
+                                    rules={[{ required: true, message: 'Digite a descrição da empresa(mín.10 caracteres)', min: 10, max: 80 }]}
                                     validateFirst
                                     hasFeedback
                                 >
                                     <Input
-                                        placeholder="Nome da escola"
-                                        showCount={formData.nome_escola.length > 0 ? true : false}
+                                        placeholder="Descrição Empresa"
+                                        showCount={formData.descricao_empresa.length > 0 ? true : false}
                                         tabIndex={1}
                                         maxLength={80}
-                                        onChange={(e) => handleInputChange('nome_escola', e.target.value)}
+                                        onChange={(e) => handleInputChange('descricao_empresa', e.target.value)}
                                         autoFocus />
                                 </Form.Item>
                             </Col>
 
                         </Row>
                         <Row gutter={gutterPadrao}>
-                            <Col span={4}>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Cep"
                                     name='cep'
@@ -402,11 +436,11 @@ export default function EscolasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={16}>
+                            <Col span={18}>
                                 <Form.Item
                                     label="Rua"
                                     name='rua'
-                                    rules={[{ required: true, message: 'Digite a rua.', min: 20, max: 80 }]}
+                                    rules={[{ required: true, message: 'Digite a rua.', min: 5, max: 60 }]}
                                     validateFirst
                                     hasFeedback
                                 >
@@ -415,12 +449,12 @@ export default function EscolasPage() {
                                         type="text"
                                         placeholder="Rua"
                                         showCount={formData.rua.length > 0 ? true : false}
-                                        maxLength={80}
+                                        maxLength={60}
                                         onChange={(e) => handleInputChange('rua', e.target.value)}
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={4}>
+                            <Col span={6}>
                                 <Form.Item
                                     label="Número"
                                     name='numero'
@@ -439,10 +473,7 @@ export default function EscolasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-
-                        </Row>
-                        <Row gutter={gutterPadrao}>
-                            <Col span={11}>
+                            <Col span={18}>
                                 <Form.Item
                                     label="Bairro"
                                     name='bairro'
@@ -461,6 +492,10 @@ export default function EscolasPage() {
                                     />
                                 </Form.Item>
                             </Col>
+
+                        </Row>
+                        <Row gutter={gutterPadrao}>
+
                             <Col span={11}>
                                 <Form.Item
                                     label="Cidade"
@@ -479,7 +514,7 @@ export default function EscolasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={2}>
+                            <Col span={3}>
                                 <Form.Item
                                     label="uf"
                                     name='uf'
@@ -498,7 +533,7 @@ export default function EscolasPage() {
                             </Col>
                         </Row>
                         <Row gutter={gutterPadrao}>
-                            <Col span={6}>
+                            <Col span={8}>
                                 <Form.Item
                                     label="Telefone"
                                     name='telefone1'
@@ -517,11 +552,11 @@ export default function EscolasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={6}>
+                            <Col span={8}>
                                 <Form.Item
                                     label="Telefone"
                                     name='telefone2'
-                                    rules={[{ required: true, message: 'Digite o Telefone.', min: 11, max: 11 }]}
+                                    rules={[{ required: false, message: 'Digite o Telefone.', min: 11, max: 11 }]}
                                     validateFirst
                                     hasFeedback
                                 >
@@ -560,10 +595,10 @@ export default function EscolasPage() {
         <>
             {popNotificacao ? <PopNotificacao titulo={tituloNotificacao} subTitulo={subTituloNotificacao} tipoNotificacao={tipoNotificacao} /> : null}
             <Layout style={estiloForm}>
-                <Typography style={{ paddingBottom: 10, fontSize: 18 }}>Cadastro de Escolas - Registros: {registros}</Typography>
+                <Typography style={{ paddingBottom: 10, fontSize: 18 }}>Cadastro de Empresa - Registros: {registros}</Typography>
                 <div>
-                    <Button type="primary" onClick={novaEscola} style={{ width: 150 }} icon={<PlusOutlined />}>
-                        Nova Escola
+                    <Button type="primary" onClick={novaEmpresa} style={{ width: 150 }} icon={<PlusOutlined />}>
+                        Nova Empresa
                     </Button>
                     <Button onClick={atualizarDados} style={{ width: 150, marginLeft: 5 }} icon={<ReloadOutlined />}>
                         Atualizar
@@ -575,7 +610,7 @@ export default function EscolasPage() {
                     size="small"
                     dataSource={dados}
                     columns={columns}
-                    rowKey={(record) => record.id_escola}
+                    rowKey={(record) => record.id_empresa}
                 />
 
             </Layout>
