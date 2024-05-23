@@ -52,7 +52,7 @@ class EmpresasService {
     console.log(perfil);
 
     try {
-      rs = await api.post(`${pre_url}/atualizar`, perfil, {
+      rs = await api.put(`${pre_url}/atualizar`, perfil, {
         headers: { "Content-Type": "application/json" },
       });
       return rs.data;

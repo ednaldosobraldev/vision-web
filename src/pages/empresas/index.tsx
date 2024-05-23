@@ -17,16 +17,16 @@ const estiloForm = {
 }
 
 export default function EmpresasPage() {
-    
+
     /********************* variaveis de contexto  ********************/
     const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
     const { usuario_id, setUsuarioId } = useContext(UsuarioContext);
-    
+
     const [rua, setRua] = useState('');
     const [bairro, setBairro] = useState('');
     const [cidade, setCidade] = useState('');
     const [uf, setUF] = useState('');
-    
+
     /************************** FORM PADRAO *****************************/
     const [form] = Form.useForm();
     const [isNewCadastro, setIsNewCadastro] = useState(true); // Estado para controlar se é um novo cadastro ou não
@@ -341,7 +341,7 @@ export default function EmpresasPage() {
             <div className="fade-in-div">
                 <Drawer
                     title="Cadastro de Empresa"
-                    width={700}
+                    width={1000}
                     onClose={onClose}
                     open={open}
                     placement={placement}
@@ -371,7 +371,7 @@ export default function EmpresasPage() {
                         onFinish={salvarEmpresa} /*teste */
                         onFinishFailed={onFinishFailed}
                         autoComplete="off"
-                        style={{ maxWidth: 600 }}
+                        style={{ maxWidth: 1000 }}
                         validateMessages={validateMessages}
 
                     >
@@ -387,7 +387,7 @@ export default function EmpresasPage() {
                         </Space>
                         <Divider />
                         <Row gutter={gutterPadrao}>
-                            <Col span={2}>
+                            <Col span={4}>
                                 <Form.Item
                                     label="ID"
                                     name='id_empresa'
@@ -395,11 +395,11 @@ export default function EmpresasPage() {
                                     <Input placeholder="Id" readOnly value={editando ? formData.id_empresa : ''} />
                                 </Form.Item>
                             </Col>
-                            <Col span={22}>
+                            <Col span={10}>
                                 <Form.Item
                                     label="Descrição Empresa"
                                     name='descricao_empresa'
-                                    rules={[{ required: true, message: 'Digite a descrição da empresa(mín.10 caracteres)', min: 10, max: 80 }]}
+                                    rules={[{ required: true, message: 'Digite a descrição da empresa(mín.10 caracteres)', min: 10, max: 40 }]}
                                     validateFirst
                                     hasFeedback
                                 >
@@ -407,15 +407,85 @@ export default function EmpresasPage() {
                                         placeholder="Descrição Empresa"
                                         showCount={formData.descricao_empresa.length > 0 ? true : false}
                                         tabIndex={1}
-                                        maxLength={80}
+                                        maxLength={40}
                                         onChange={(e) => handleInputChange('descricao_empresa', e.target.value)}
+                                        autoFocus />
+                                </Form.Item>
+                            </Col>
+                            <Col span={10}>
+                                <Form.Item
+                                    label="Fantasia Empresa"
+                                    name='fantasia'
+                                    rules={[{ required: true, message: 'Digite o nome de fantasia.', min: 10, max: 40 }]}
+                                    validateFirst
+                                    hasFeedback
+                                >
+                                    <Input
+                                        placeholder="Fantasia"
+                                        showCount={formData.fantasia.length > 0 ? true : false}
+                                        tabIndex={1}
+                                        maxLength={40}
+                                        onChange={(e) => handleInputChange('fantasia', e.target.value)}
                                         autoFocus />
                                 </Form.Item>
                             </Col>
 
                         </Row>
                         <Row gutter={gutterPadrao}>
+                            <Col span={12}>
+                                <Form.Item
+                                    label="Razão Empresa"
+                                    name='razao'
+                                    rules={[{ required: true, message: 'Digite a razão social.', min: 10, max: 40 }]}
+                                    validateFirst
+                                    hasFeedback
+                                >
+                                    <Input
+                                        placeholder="Fantasia"
+                                        showCount={formData.razao.length > 0 ? true : false}
+                                        tabIndex={1}
+                                        maxLength={40}
+                                        onChange={(e) => handleInputChange('razao', e.target.value)}
+                                        autoFocus />
+                                </Form.Item>
+                            </Col>
                             <Col span={6}>
+                                <Form.Item
+                                    label="Cnpj/Cpf"
+                                    name='cpf_cnpj'
+                                    rules={[{ required: true, message: 'Digite o Cnpj/Cpf da empresa(mín.11 caracteres)', min: 11, max: 14 }]}
+                                    validateFirst
+                                    hasFeedback
+                                >
+                                    <Input
+                                        placeholder="Cnpj/Cpf Empresa"
+                                        showCount={formData.cpf_cnpj.length > 0 ? true : false}
+                                        tabIndex={1}
+                                        maxLength={14}
+                                        onChange={(e) => handleInputChange('cpf_cnpj', e.target.value)}
+                                        autoFocus />
+                                </Form.Item>
+                            </Col>
+                            <Col span={6}>
+                                <Form.Item
+                                    label="IE"
+                                    name='ie'
+                                    rules={[{ required: true, message: 'Digite a IE da empresa(mín.11 caracteres)', min: 11, max: 14 }]}
+                                    validateFirst
+                                    hasFeedback
+                                >
+                                    <Input
+                                        placeholder="IE da Empresa"
+                                        showCount={formData.ie.length > 0 ? true : false}
+                                        tabIndex={1}
+                                        maxLength={14}
+                                        onChange={(e) => handleInputChange('ie', e.target.value)}
+                                        autoFocus />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Row gutter={gutterPadrao}>
+                            <Col span={4}>
                                 <Form.Item
                                     label="Cep"
                                     name='cep'
@@ -436,7 +506,7 @@ export default function EmpresasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={18}>
+                            <Col span={8}>
                                 <Form.Item
                                     label="Rua"
                                     name='rua'
@@ -454,7 +524,7 @@ export default function EmpresasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={6}>
+                            <Col span={4}>
                                 <Form.Item
                                     label="Número"
                                     name='numero'
@@ -473,7 +543,7 @@ export default function EmpresasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={18}>
+                            <Col span={8}>
                                 <Form.Item
                                     label="Bairro"
                                     name='bairro'
@@ -492,11 +562,9 @@ export default function EmpresasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-
                         </Row>
                         <Row gutter={gutterPadrao}>
-
-                            <Col span={11}>
+                            <Col span={8}>
                                 <Form.Item
                                     label="Cidade"
                                     name='cidade'
@@ -514,7 +582,7 @@ export default function EmpresasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={3}>
+                            <Col span={2}>
                                 <Form.Item
                                     label="uf"
                                     name='uf'
@@ -533,7 +601,7 @@ export default function EmpresasPage() {
                             </Col>
                         </Row>
                         <Row gutter={gutterPadrao}>
-                            <Col span={8}>
+                            <Col span={5}>
                                 <Form.Item
                                     label="Telefone"
                                     name='telefone1'
@@ -542,7 +610,6 @@ export default function EmpresasPage() {
                                     hasFeedback
                                 >
                                     <Input
-                                        style={{ width: '100%' }}
                                         type="text"
                                         placeholder="Telefone"
                                         tabIndex={4}
@@ -551,8 +618,8 @@ export default function EmpresasPage() {
                                         maxLength={11}
                                     />
                                 </Form.Item>
-                            </Col>
-                            <Col span={8}>
+                            </Col> 
+                            <Col span={5}>
                                 <Form.Item
                                     label="Telefone"
                                     name='telefone2'
@@ -561,7 +628,6 @@ export default function EmpresasPage() {
                                     hasFeedback
                                 >
                                     <Input
-                                        style={{ width: '100%' }}
                                         type="text"
                                         placeholder="Telefone"
                                         tabIndex={5}
@@ -571,7 +637,7 @@ export default function EmpresasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={6}>
+                            <Col span={1}>
                                 <Form.Item
                                     name="ativo"
                                     label="Ativo?"
@@ -583,7 +649,6 @@ export default function EmpresasPage() {
                                 </Form.Item>
                             </Col>
                         </Row>
-
                     </Form>
                 </Drawer>
             </div>
