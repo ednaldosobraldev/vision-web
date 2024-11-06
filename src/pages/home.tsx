@@ -83,17 +83,17 @@ export default function HomePage() {
         >
           {collapsed ? (
             <Image
-              src="logo2.png"
+              src="logo_vision.jpg"
               style={{
-                width: "50px",
-                height: "70px",
+                width: "60px",
+                height: "60px",
               }}
               preview={false}
             />
           ) : (
             <Image
-              src="logo.png"
-              style={{ width: "200px", height: "70px" }}
+              src="logo_vision.jpg"
+              style={{ width: "200px", height: "60px" }}
               preview={false}
             />
           )}

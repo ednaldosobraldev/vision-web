@@ -1,5 +1,5 @@
 import axios from "axios";
-import { EmpresaModel } from "../models/Empresa";
+import { EmpresaModel } from "../models/EmpresaModel";
 
 
 const api = axios.create({
@@ -63,7 +63,7 @@ class EmpresasService {
 
   async desativarEmpresa(id: number) {
     try {
-      let rs = await api.patch(`${pre_url}/desativarperfil/${id}`);
+      let rs = await api.put(`${pre_url}/desativar-empresa/${id}`);
       console.log(rs);
       return rs
     } catch (e) {

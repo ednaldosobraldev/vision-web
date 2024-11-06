@@ -2,12 +2,11 @@ import LoginPage from "./pages/login";
 import HomePage from "./pages/home";
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import UsuariosAdmin from "./pages/usuarios-admin";
-import EscolasPage from "./pages/escolas/index";
 import PerfisPage from "./pages/perfis";
 import DashBoard from "./pages/dashboard";
 import ErrorPage from "./pages/error";
 import CadUsuarios from "./pages/usuarios-admin/CadUsuarios";
-import EmpresasPage from "./pages/empresas";
+import EmpresasPage from "./pages/empresas/index";
 import InicioPage from "./pages/inicioPage";
 
 function App() {
@@ -19,7 +18,6 @@ function App() {
           <Route path="/usuarios-admin" element={<UsuariosAdmin />} />
              {/* <Route path="cad" element={<CadUsuarios idusuario={0}/>}/>*/}
           <Route path="/dashboard" element={<DashBoard />} />
-          <Route path="/escolas" element={< EscolasPage />} />
           <Route path="/perfis" element={< PerfisPage />} />
           <Route path="/empresas" element={< EmpresasPage />} />
           {/*<Route

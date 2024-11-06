@@ -6,7 +6,7 @@ import Table, { ColumnsType } from "antd/es/table";
 import { CaretLeftOutlined, CaretRightOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from "@ant-design/icons";
 import PopUpConfirmarAcaoDeletar from "../../components/DeletarRegComponent";
 import PopUpConfirmarAcaoAtivarInativar from "../../components/InativarRegComponent";
-import { EmpresaModel } from "../../models/Empresa";
+import { EmpresaModel } from "../../models/EmpresaModel";
 import PopNotificacao from "../../components/PopNotificacao";
 
 
@@ -16,20 +16,37 @@ const estiloForm = {
     backgroundColor: '#FFFFFF',
 }
 
+interface DataTypeEmpresas {
+    key: number;
+    id_empresa: number;
+    cpf_cnpj: string;
+    ie: string;
+    descricao_empresa: string;
+    razao: string;
+    fantasia: string;
+    cep: string;
+    cidade: string;
+    bairro: string;
+    numero: string;
+    uf: string;
+    telefone1: string;
+    telefone2: string;
+    data_cadastro: string;
+    data_alt: string;
+    ativo: boolean;
+}
+
+
 export default function EmpresasPage() {
 
     /********************* variaveis de contexto  ********************/
     const { id_empresa, setIdEmpresa } = useContext(UsuarioContext);
     const { usuario_id, setUsuarioId } = useContext(UsuarioContext);
 
-    const [rua, setRua] = useState('');
-    const [bairro, setBairro] = useState('');
-    const [cidade, setCidade] = useState('');
-    const [uf, setUF] = useState('');
-
     /************************** FORM PADRAO *****************************/
     const [form] = Form.useForm();
     const [isNewCadastro, setIsNewCadastro] = useState(true); // Estado para controlar se é um novo cadastro ou não
+    //const [hasFeedback, setHasFeedback] = useState(false);
 
     const [dados, setDados] = useState([]);
     const [registros, setRegistros] = useState(0);
@@ -47,29 +64,15 @@ export default function EmpresasPage() {
     const [tipoNotificacao, setTipoNotificacao] = useState('success')
     //************* PopNotificacao *****************/
 
-    /***************** padrao das telas(INICIO) ******************* */
-    /***************** teste setar dados ******************/
-    // Estado para armazenar os dados do formulário
-    const [formData, setFormData] = useState({
-        id_empresa: 0,
-        cpf_cnpj: '',
-        ie: '',
-        descricao_empresa: '',
-        razao: '',
-        fantasia: '',
-        rua: '',
-        bairro: '',
-        cidade: '',
-        uf: '',
-        cep: '',
-        numero: '',
-        telefone1: '',
-        telefone2: '',
-        ativo: true
-    });
-
     useEffect(() => {
         listaEmpresas(id_empresa)
+
+        // const interval = setInterval(() => {
+        //     listaEmpresas(id_empresa)
+        // }, 10000);
+
+        // // Limpa o intervalo quando o componente é desmontado
+        // return () => clearInterval(interval);
     }, []);
 
     async function listaEmpresas(id_empresa: number) {
@@ -80,210 +83,7 @@ export default function EmpresasPage() {
         setRegistros(rs.data.tamanho)
     }
 
-    function editarEmpresa(dadosrecebidos: any) {
-        setEditando(true)
-
-        setFormData({
-            id_empresa: dadosrecebidos.id_empresa,
-            descricao_empresa: dadosrecebidos.descricao_empresa,
-            razao: dadosrecebidos.razao,
-            fantasia: dadosrecebidos.fantasia,
-            cpf_cnpj: dadosrecebidos.cpf_cnpj,
-            ie: dadosrecebidos.ie,
-            rua: dadosrecebidos.rua,
-            bairro: dadosrecebidos.bairro,
-            cidade: dadosrecebidos.cidade,
-            uf: dadosrecebidos.uf,
-            cep: dadosrecebidos.cep,
-            numero: dadosrecebidos.numero,
-            telefone1: dadosrecebidos.telefone1,
-            telefone2: dadosrecebidos.telefone2 !== null ? dadosrecebidos.telefone2 : '',
-            ativo: dadosrecebidos.ativo
-        })
-        form.setFieldsValue({
-            id_empresa: dadosrecebidos.id_empresa,
-            descricao_empresa: dadosrecebidos.descricao_empresa,
-            razao: dadosrecebidos.razao,
-            fantasia: dadosrecebidos.fantasia,
-            cpf_cnpj: dadosrecebidos.cpf_cnpj,
-            ie: dadosrecebidos.ie,
-            rua: dadosrecebidos.rua,
-            bairro: dadosrecebidos.bairro,
-            cidade: dadosrecebidos.cidade,
-            uf: dadosrecebidos.uf,
-            cep: dadosrecebidos.cep,
-            numero: dadosrecebidos.numero,
-            telefone1: dadosrecebidos.telefone1,
-            telefone2: dadosrecebidos.telefone2,
-            ativo: dadosrecebidos.ativo
-        });
-        console.log(dadosrecebidos)
-
-        showDrawer()
-
-    }
-
-    function voltarRegisto(idEmpresa: Number) {
-        console.log(idEmpresa)
-    }
-
-    function avancarRegisto(idEmpresa: Number) {
-        console.log(idEmpresa)
-    }
-
-    async function buscarCep(e: any) {
-        let x = e.target.value;
-        if (x.length === 8) {
-            let rs = await service.buscaCep(x)
-            console.log(rs);
-            setRua(rs.logradouro)
-            setBairro(rs.bairro)
-            setCidade(rs.localidade)
-            setUF(rs.uf)
-        }
-    }
-
-    function novaEmpresa() {
-        setEditando(false)
-        setFormData({
-            id_empresa: 0,
-            cpf_cnpj: '',
-            ie: '',
-            descricao_empresa: '',
-            razao: '',
-            fantasia: '',
-            rua: '',
-            bairro: '',
-            cidade: '',
-            uf: '',
-            cep: '',
-            numero: '',
-            telefone1: '',
-            telefone2: '',
-            ativo: true
-        })
-        form.setFieldsValue({
-            id_empresa: 0,
-            cpf_cnpj: '',
-            ie: '',
-            descricao_empresa: '',
-            razao: '',
-            fantasia: '',
-            rua: '',
-            bairro: '',
-            cidade: '',
-            uf: '',
-            cep: '',
-            numero: '',
-            telefone1: '',
-            telefone2: '',
-            ativo: true
-        });
-        console.log(formData)
-        showDrawer()
-    }
-    const onFinishFailed = (errorInfo: any) => {
-        console.log("Failed:", errorInfo);
-    };
-
-    const onReset = () => {
-        form.resetFields();
-    };
-
-    // Função para manipular a alteração nos campos do formulário
-    const handleInputChange = (fieldName: string, value: any) => {
-        setFormData({
-            ...formData,
-            [fieldName]: value,
-        });
-        console.log(formData);
-    };
-    // Função para lidar com o envio do formulário
-    const salvarEmpresa = async () => {
-
-        setLoading(true);
-        console.log('************* salvando(ON FINISH) ***********')
-        let empresa = new EmpresaModel(
-            +formData.id_empresa,
-            formData.descricao_empresa,
-            formData.cpf_cnpj,
-            formData.ie,
-            formData.razao,
-            formData.fantasia,
-            formData.rua,
-            formData.bairro,
-            formData.cidade,
-            formData.uf,
-            formData.cep,
-            formData.numero,
-            formData.telefone1,
-            formData.telefone2,
-            formData.ativo)
-
-        let res;
-        !editando ? res = await service.cadastrarEmpresa(empresa) : res = await service.atualizarEmpresa(empresa)
-        setStatus(res)
-
-
-        //************ pop notificacao ************/
-        setPopNotificacao(true);
-        setSubTituloNotificacao(res.mensagem)
-        res.status === 401 ?? setTipoNotificacao('error')
-        //************ pop notificacao ************/
-
-        setTimeout(function () {
-            listaEmpresas(id_empresa)
-            setLoading(false)
-            onClose()
-        }, 1000);
-        listaEmpresas(id_empresa)
-
-        //************ pop notificacao ************/
-        setTimeout(() => {
-            setPopNotificacao(false);
-        }, 5000);
-        //************ pop notificacao ************/
-    };
-
-    function _atualizarDados() {
-        listaEmpresas(id_empresa)
-    }
-
-    function atualizarDados() {
-        listaEmpresas(id_empresa)
-    }
-
-
-
-
-    const validateMessages = {
-        required: '${label} is required!',
-        types: {
-            email: '${label} is not a valid email!',
-            number: '${label} is not a valid number!',
-        },
-        number: {
-            range: '${label} must be between ${min} and ${max}',
-        },
-    };
-
-    interface DataTypeEmpresas {
-        key: number;
-        id_empresa: number;
-        cpf_cnpj: string;
-        ie: string;
-        descricao_empresa: string;
-        razao: string;
-        fantasia: string;
-        cep: string;
-        cidade: string;
-        bairro: string;
-        numero: string;
-        uf: string;
-        telefone1: string;
-        telefone2: string;
-        ativo: boolean;
-    }
+   
 
     const columns: ColumnsType<DataTypeEmpresas> = [
         {
@@ -314,13 +114,199 @@ export default function EmpresasPage() {
         },
     ];
 
+    /***************** padrao das telas(INICIO) ******************* */
+    /***************** teste setar dados ******************/
+    // Estado para armazenar os dados do formulário
+    const [formData, setFormData] = useState({
+        id_empresa: 0,
+        cpf_cnpj: '',
+        ie: '',
+        descricao_empresa: '',
+        razao: '',
+        fantasia: '',
+        rua: '',
+        bairro: '',
+        cidade: '',
+        uf: '',
+        cep: '',
+        numero: '',
+        telefone1: '',
+        telefone2: '',
+        data_cadastro: '',
+        data_alt: '',
+        ativo: true
+    });
+
+    function editarEmpresa(dadosrecebidos: any) {
+        setEditando(true)
+
+        setFormData({
+            id_empresa: dadosrecebidos.id_empresa,
+            descricao_empresa: dadosrecebidos.descricao_empresa,
+            razao: dadosrecebidos.razao,
+            fantasia: dadosrecebidos.fantasia,
+            cpf_cnpj: dadosrecebidos.cpf_cnpj,
+            ie: dadosrecebidos.ie,
+            rua: dadosrecebidos.rua,
+            bairro: dadosrecebidos.bairro,
+            cidade: dadosrecebidos.cidade,
+            uf: dadosrecebidos.uf,
+            cep: dadosrecebidos.cep,
+            numero: dadosrecebidos.numero,
+            telefone1: dadosrecebidos.telefone1,
+            telefone2: dadosrecebidos.telefone2 !== null ? dadosrecebidos.telefone2 : '',
+            data_cadastro: dadosrecebidos.data_cadastro,
+            data_alt: dadosrecebidos.data_alt,
+            ativo: dadosrecebidos.ativo
+        })
+        form.setFieldsValue({
+            id_empresa: dadosrecebidos.id_empresa,
+            descricao_empresa: dadosrecebidos.descricao_empresa,
+            razao: dadosrecebidos.razao,
+            fantasia: dadosrecebidos.fantasia,
+            cpf_cnpj: dadosrecebidos.cpf_cnpj,
+            ie: dadosrecebidos.ie,
+            rua: dadosrecebidos.rua,
+            bairro: dadosrecebidos.bairro,
+            cidade: dadosrecebidos.cidade,
+            uf: dadosrecebidos.uf,
+            cep: dadosrecebidos.cep,
+            numero: dadosrecebidos.numero,
+            telefone1: dadosrecebidos.telefone1,
+            telefone2: dadosrecebidos.telefone2,
+            data_cadastro: dadosrecebidos.data_cadastro,
+            data_alt: dadosrecebidos.data_alt,
+            ativo: dadosrecebidos.ativo
+        });
+        console.log(dadosrecebidos)
+
+        showDrawer()
+
+    }
+
+    function novaEmpresa() {
+
+        setEditando(false)
+        setFormData({
+            id_empresa: 0,
+            cpf_cnpj: '',
+            ie: '',
+            descricao_empresa: '',
+            razao: '',
+            fantasia: '',
+            rua: '',
+            bairro: '',
+            cidade: '',
+            uf: '',
+            cep: '',
+            numero: '',
+            telefone1: '',
+            telefone2: '',
+            data_cadastro: '',
+            data_alt: '',
+            ativo: true
+        })
+        form.setFieldsValue({
+            id_empresa: 0,
+            cpf_cnpj: '',
+            ie: '',
+            descricao_empresa: '',
+            razao: '',
+            fantasia: '',
+            rua: '',
+            bairro: '',
+            cidade: '',
+            uf: '',
+            cep: '',
+            numero: '',
+            telefone1: '',
+            telefone2: '',
+            data_cadastro: '',
+            data_alt: '',
+            ativo: true
+        });
+        ///console.log(formData)
+        showDrawer()
+    }
+
+    const onFinishFailed = (errorInfo: any) => {
+        console.log("Failed:", errorInfo);
+    };
+
+    // Função para manipular a alteração nos campos do formulário
+    const handleInputChange = (fieldName: string, value: any) => {
+        setFormData({
+            ...formData,
+            [fieldName]: value,
+        });
+
+        // console.log(formData);
+    };
+    // Função para lidar com o envio do formulário
+
+    const salvarEmpresa = async () => {
+
+        setLoading(true);
+        console.log('************* salvando(ON FINISH) ***********')
+        let empresa = new EmpresaModel(
+            +formData.id_empresa,
+            formData.descricao_empresa,
+            formData.cpf_cnpj,
+            formData.ie,
+            formData.razao,
+            formData.fantasia,
+            formData.rua,
+            formData.bairro,
+            formData.cidade,
+            formData.uf,
+            formData.cep,
+            formData.numero,
+            formData.telefone1,
+            formData.telefone2,
+            formData.ativo)
+
+        let res;
+        !editando ? res = await service.cadastrarEmpresa(empresa) : res = await service.atualizarEmpresa(empresa)
+        setStatus(res)
+
+
+        //************ pop notificacao ************/
+        setPopNotificacao(true);
+        setSubTituloNotificacao(res.mensagem)
+        // res.status === 401 ?? setTipoNotificacao('error')
+        res.status === 401 ? setTipoNotificacao('error') : setTipoNotificacao('success');
+        //************ pop notificacao ************/
+
+        setTimeout(function () {
+            listaEmpresas(id_empresa)
+            setLoading(false)
+            onClose()
+        }, 1000);
+        listaEmpresas(id_empresa)
+
+        //************ pop notificacao ************/
+        setTimeout(() => {
+            setPopNotificacao(false);
+        }, 5000);
+        //************ pop notificacao ************/
+    };
+
+    function _atualizarDados() {
+        listaEmpresas(id_empresa)
+    }
+
+    function atualizarDados() {
+        listaEmpresas(id_empresa)
+    }
 
     /************* DRAWER INICIO *************/
     //************* PARAMETROS DRAWER INICIO *******************/
     const gutterPadrao = { xs: 2, sm: 4, md: 4, lg: 4 }
     const [open, setOpen] = useState(false);
     const [placement, setPlacement] = useState<DrawerProps['placement']>('right');
+
     const showDrawer = () => {
+        console.log('**** showDrawer ****')
         setOpen(true);
     };
 
@@ -336,6 +322,61 @@ export default function EmpresasPage() {
         animation: 'fadeout 50s'
     }
 
+    function voltarRegisto(idEmpresa: Number) {
+        console.log(idEmpresa)
+    }
+
+    function avancarRegisto(idEmpresa: Number) {
+        console.log(idEmpresa)
+    }
+
+    const onReset = () => {
+        form.resetFields();
+        setFormData({
+            id_empresa: 0,
+            cpf_cnpj: '',
+            ie: '',
+            descricao_empresa: '',
+            razao: '',
+            fantasia: '',
+            rua: '',
+            bairro: '',
+            cidade: '',
+            uf: '',
+            cep: '',
+            numero: '',
+            telefone1: '',
+            telefone2: '',
+            data_cadastro: '',
+            data_alt: '',
+            ativo: true
+        })
+
+        //setHasFeedback(false);  // Desativa o feedback visual
+    };
+
+    async function buscarCep(e: any) {
+        let x = e.target.value;
+        if (x.length === 8) {
+            let rs = await service.buscaCep(x)
+            console.log(rs);
+
+            setFormData(prevFormData => ({
+                ...prevFormData,  // Preserva os valores existentes dos outros campos
+                rua: rs.logradouro,
+                bairro: rs.bairro,
+                cidade: rs.localidade,
+                uf: rs.uf
+            }));
+
+            form.setFieldsValue({
+                rua: rs.logradouro,
+                bairro: rs.bairro,
+                cidade: rs.localidade,
+                uf: rs.uf
+            });
+        }
+    }
     const DrawerComponent = (
         <>
             <div className="fade-in-div">
@@ -367,12 +408,13 @@ export default function EmpresasPage() {
                     <Divider />
                     <Form
                         form={form}
+                        // initialValues={formData}
                         layout="vertical"
                         onFinish={salvarEmpresa} /*teste */
                         onFinishFailed={onFinishFailed}
                         autoComplete="off"
                         style={{ maxWidth: 1000 }}
-                        validateMessages={validateMessages}
+                    // validateMessages={validateMessages}
 
                     >
 
@@ -399,34 +441,35 @@ export default function EmpresasPage() {
                                 <Form.Item
                                     label="Descrição Empresa"
                                     name='descricao_empresa'
-                                    rules={[{ required: true, message: 'Digite a descrição da empresa(mín.10 caracteres)', min: 10, max: 40 }]}
                                     validateFirst
-                                    hasFeedback
+                                    hasFeedback={formData.descricao_empresa.length > 0 ? true : false}
+                                    rules={[{ required: true, message: 'Digite a descrição da empresa(mín.10 caracteres)', min: 10, max: 40 }]}
                                 >
                                     <Input
                                         placeholder="Descrição Empresa"
-                                        showCount={formData.descricao_empresa.length > 0 ? true : false}
                                         tabIndex={1}
+                                        showCount
                                         maxLength={40}
+                                        value={formData.descricao_empresa}
                                         onChange={(e) => handleInputChange('descricao_empresa', e.target.value)}
-                                        autoFocus />
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={10}>
                                 <Form.Item
                                     label="Fantasia Empresa"
                                     name='fantasia'
-                                    rules={[{ required: true, message: 'Digite o nome de fantasia.', min: 10, max: 40 }]}
-                                    validateFirst
-                                    hasFeedback
+                                    rules={[{ required: true, message: 'Digite o nome de fantasia.', min: 1, max: 30 }]}
+                                // validateFirst
+                                // hasFeedback={formData.fantasia.length > 0 ? true : false} 
                                 >
                                     <Input
                                         placeholder="Fantasia"
-                                        showCount={formData.fantasia.length > 0 ? true : false}
-                                        tabIndex={1}
+                                        tabIndex={2}
                                         maxLength={40}
+                                        value={formData.fantasia}
                                         onChange={(e) => handleInputChange('fantasia', e.target.value)}
-                                        autoFocus />
+                                    />
                                 </Form.Item>
                             </Col>
 
@@ -437,16 +480,15 @@ export default function EmpresasPage() {
                                     label="Razão Empresa"
                                     name='razao'
                                     rules={[{ required: true, message: 'Digite a razão social.', min: 10, max: 40 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.razao.length > 0 ? true : false}
                                 >
                                     <Input
                                         placeholder="Fantasia"
-                                        showCount={formData.razao.length > 0 ? true : false}
-                                        tabIndex={1}
+                                        tabIndex={3}
                                         maxLength={40}
                                         onChange={(e) => handleInputChange('razao', e.target.value)}
-                                        autoFocus />
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={6}>
@@ -454,16 +496,15 @@ export default function EmpresasPage() {
                                     label="Cnpj/Cpf"
                                     name='cpf_cnpj'
                                     rules={[{ required: true, message: 'Digite o Cnpj/Cpf da empresa(mín.11 caracteres)', min: 11, max: 14 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.cpf_cnpj.length > 0 ? true : false}
                                 >
                                     <Input
                                         placeholder="Cnpj/Cpf Empresa"
-                                        showCount={formData.cpf_cnpj.length > 0 ? true : false}
-                                        tabIndex={1}
+                                        tabIndex={4}
                                         maxLength={14}
                                         onChange={(e) => handleInputChange('cpf_cnpj', e.target.value)}
-                                        autoFocus />
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={6}>
@@ -471,16 +512,15 @@ export default function EmpresasPage() {
                                     label="IE"
                                     name='ie'
                                     rules={[{ required: true, message: 'Digite a IE da empresa(mín.11 caracteres)', min: 11, max: 14 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.ie.length > 0 ? true : false}
                                 >
                                     <Input
                                         placeholder="IE da Empresa"
-                                        showCount={formData.ie.length > 0 ? true : false}
-                                        tabIndex={1}
+                                        tabIndex={5}
                                         maxLength={14}
                                         onChange={(e) => handleInputChange('ie', e.target.value)}
-                                        autoFocus />
+                                    />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -490,16 +530,15 @@ export default function EmpresasPage() {
                                     label="Cep"
                                     name='cep'
                                     rules={[{ required: true, message: 'Digite o cep.', min: 8, max: 8 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.cep.length > 0 ? true : false}
                                 >
                                     <Input
                                         style={{ width: '100%' }}
                                         type="text"
                                         placeholder="Cep"
-                                        tabIndex={2}
+                                        tabIndex={6}
                                         maxLength={8}
-                                        showCount={formData.cep.length > 0 ? true : false}
                                         /*onChange={(e)=>Number.parseInt(e.target.value) == 8 ? buscarCep : salvarCep}*/
                                         onChange={(e) => handleInputChange('cep', e.target.value)}
                                         onKeyUp={buscarCep}
@@ -511,14 +550,13 @@ export default function EmpresasPage() {
                                     label="Rua"
                                     name='rua'
                                     rules={[{ required: true, message: 'Digite a rua.', min: 5, max: 60 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.rua.length > 0 ? true : false}
                                 >
                                     <Input
                                         style={{ width: '100%' }}
                                         type="text"
                                         placeholder="Rua"
-                                        showCount={formData.rua.length > 0 ? true : false}
                                         maxLength={60}
                                         onChange={(e) => handleInputChange('rua', e.target.value)}
                                     />
@@ -529,16 +567,15 @@ export default function EmpresasPage() {
                                     label="Número"
                                     name='numero'
                                     rules={[{ required: true, message: 'Digite o número.', min: 1, max: 10 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.numero.length > 0 ? true : false}
                                 >
                                     <Input
                                         style={{ width: '100%' }}
                                         type="text"
                                         placeholder="Nº"
-                                        tabIndex={3}
+                                        tabIndex={7}
                                         maxLength={10}
-                                        showCount={formData.numero.length > 0 ? true : false}
                                         onChange={(e) => handleInputChange('numero', e.target.value)}
                                     />
                                 </Form.Item>
@@ -548,15 +585,14 @@ export default function EmpresasPage() {
                                     label="Bairro"
                                     name='bairro'
                                     rules={[{ required: true, message: 'Digite o bairro.', min: 3, max: 20 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.bairro.length > 0 ? true : false}
                                 >
                                     <Input
                                         style={{ width: '100%' }}
                                         type="text"
                                         placeholder="Bairro"
                                         maxLength={20}
-                                        showCount={formData.bairro.length > 0 ? true : false}
                                         onChange={(e) => handleInputChange('bairro', e.target.value)}
 
                                     />
@@ -569,15 +605,14 @@ export default function EmpresasPage() {
                                     label="Cidade"
                                     name='cidade'
                                     rules={[{ required: true, message: 'Digite a cidade.', min: 5, max: 30 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.cidade.length > 0 ? true : false}
                                 >
                                     <Input
                                         style={{ width: '100%' }}
                                         type="text"
                                         placeholder="Cidade"
                                         maxLength={30}
-                                        showCount={formData.cidade.length > 0 ? true : false}
                                         onChange={(e) => handleInputChange('cidade', e.target.value)}
                                     />
                                 </Form.Item>
@@ -587,8 +622,8 @@ export default function EmpresasPage() {
                                     label="uf"
                                     name='uf'
                                     rules={[{ required: true, message: 'Digite a UF.', min: 2, max: 2 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.uf.length > 0 ? true : false}
                                 >
                                     <Input
                                         style={{ width: '100%' }}
@@ -599,53 +634,77 @@ export default function EmpresasPage() {
                                     />
                                 </Form.Item>
                             </Col>
-                        </Row>
-                        <Row gutter={gutterPadrao}>
                             <Col span={5}>
                                 <Form.Item
                                     label="Telefone"
                                     name='telefone1'
                                     rules={[{ required: true, message: 'Digite o Telefone.', min: 11, max: 11 }]}
                                     validateFirst
-                                    hasFeedback
+                                // hasFeedback={formData.telefone1.length > 0 ? true : false}
                                 >
                                     <Input
                                         type="text"
                                         placeholder="Telefone"
-                                        tabIndex={4}
-                                        showCount={formData.telefone1.length > 0 ? true : false}
+                                        tabIndex={8}
                                         onChange={(e) => handleInputChange('telefone1', e.target.value)}
                                         maxLength={11}
                                     />
                                 </Form.Item>
-                            </Col> 
+                            </Col>
                             <Col span={5}>
                                 <Form.Item
                                     label="Telefone"
                                     name='telefone2'
                                     rules={[{ required: false, message: 'Digite o Telefone.', min: 11, max: 11 }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
+                                // hasFeedback={formData.telefone2.length > 0 ? true : false}
                                 >
                                     <Input
                                         type="text"
                                         placeholder="Telefone"
-                                        tabIndex={5}
-                                        showCount={formData.telefone2.length > 0 ? true : false}
+                                        tabIndex={9}
                                         onChange={(e) => handleInputChange('telefone2', e.target.value)}
                                         maxLength={11}
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={1}>
+                            <Col span={2}>
                                 <Form.Item
                                     name="ativo"
                                     label="Ativo?"
                                     rules={[{ required: false, message: '' }]}
-                                    validateFirst
-                                    hasFeedback
+                                // validateFirst
                                 >
-                                    <Switch onChange={(e) => handleInputChange('ativo', e)} title="Ativo?" tabIndex={3} checked={formData.ativo} />
+                                    <Switch onChange={(e) => handleInputChange('ativo', e)} title="Ativo?" checked={formData.ativo} />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                        <Row gutter={gutterPadrao}>
+                            <Col span={5}>
+                                <Form.Item
+                                    label="Data Cadastro"
+                                    name='data_cadastro'
+                                    rules={[{ required: false, message: 'Digite o Telefone.', min: 11, max: 11 }]}
+                                // validateFirst
+                                >
+                                    <Input
+                                        type="text"
+                                        readOnly
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={5}>
+                                <Form.Item
+                                    label="Data Alteração"
+                                    name='data_alt'
+                                    rules={[{ required: false, message: 'Digite o Telefone.', min: 11, max: 11 }]}
+                                // validateFirst
+                                >
+                                    <Input
+                                        type="text"
+                                        tabIndex={5}
+                                        readOnly
+                                    />
                                 </Form.Item>
                             </Col>
                         </Row>

@@ -47,7 +47,7 @@ export default function MenuComponent() {
             >
                 {collapsed ? (
                     <Image
-                        src="logo2.png"
+                        src="logo_vision.jpg"
                         style={{
                             width: "50px",
                             height: "70px",
@@ -56,7 +56,7 @@ export default function MenuComponent() {
                     />
                 ) : (
                     <Image
-                        src="logo.png"
+                        src="logo_vision.jpg"
                         style={{ width: "200px", height: "70px" }}
                         preview={false}
                     />

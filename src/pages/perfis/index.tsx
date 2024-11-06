@@ -120,7 +120,8 @@ export default function PerfisPage() {
         //************ pop notificacao ************/
         setPopNotificacao(true);
         setSubTituloNotificacao(res.mensagem)
-        res.status == 401 ?? setTipoNotificacao('error')
+        // res.status == 401 ?? setTipoNotificacao('error')
+        res.status === 401 ? setTipoNotificacao('error') : setTipoNotificacao('success');
         //************ pop notificacao ************/
 
         setTimeout(function () {

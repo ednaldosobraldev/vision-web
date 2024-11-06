@@ -20,8 +20,8 @@ export default function PopUpConfirmarAcaoAtivarInativar(props: PropsPopUpConfir
 
     //************* PopNotificacao *****************/
     const [popNotificacao, setPopNotificacao] = useState(false)
-    const [tituloNotificacao, setTituloNotificacao] = useState('Ativar/Inativar Perfil')
-    const [subTituloNotificacao, setSubTituloNotificacao] = useState('Perfil Ativado/Desativado com sucesso.')
+    const [tituloNotificacao, setTituloNotificacao] = useState('Ativar/Inativar')
+    const [subTituloNotificacao, setSubTituloNotificacao] = useState('Registro Ativado/Desativado com sucesso.')
     const [tipoNotificacao, setTipoNotificacao] = useState('success')
     //************* PopNotificacao *****************/
 
@@ -30,8 +30,6 @@ export default function PopUpConfirmarAcaoAtivarInativar(props: PropsPopUpConfir
         var rs
         try {
             rs = await props.metodoService(id);
-            let x = rs.data.mensagem
-            return x;
         } catch (e) {
             setSubTituloNotificacao('Não foi possível atualizar o perfil.')
             setTipoNotificacao('error')
@@ -43,6 +41,7 @@ export default function PopUpConfirmarAcaoAtivarInativar(props: PropsPopUpConfir
 
     const handleOk = async () => {
         setConfirmLoading(true);
+        console.log(props.idRegistro)
 
         await ativarDesativar(props.idRegistro)
         setPopNotificacao(true);
